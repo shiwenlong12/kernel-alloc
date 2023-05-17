@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":[["init","初始化内存分配。"],["transfer","将一个内存块托管到内存分配器。"]]};

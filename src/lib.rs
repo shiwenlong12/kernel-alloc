@@ -5,9 +5,11 @@
 
 extern crate alloc;
 
+#[cfg(feature = "kernel")]
 use alloc::alloc::handle_alloc_error;
+#[cfg(feature = "kernel")]
+use core::{alloc::{GlobalAlloc, Layout},};
 use core::{
-    alloc::{GlobalAlloc, Layout},
     ptr::NonNull,
 };
 use customizable_buddy::{BuddyAllocator, LinkedListBuddy, UsizeBuddy};
@@ -44,11 +46,14 @@ pub unsafe fn transfer(region: &'static mut [u8]) {
 /// 不考虑并发使用，因此没有加锁。
 static mut HEAP: BuddyAllocator<21, UsizeBuddy, LinkedListBuddy> = BuddyAllocator::new();
 
+#[cfg(feature = "kernel")]
 struct Global;
 
+#[cfg(feature = "kernel")]
 #[global_allocator]
 static GLOBAL: Global = Global;
 
+#[cfg(feature = "kernel")]
 unsafe impl GlobalAlloc for Global {
     #[inline]
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
@@ -72,12 +77,14 @@ unsafe impl GlobalAlloc for Global {
 #[cfg(test)]
 mod tests {
     
-    use crate::{init,transfer};
+    use crate::{init
+        //,transfer
+    };
     //use crate::Global;
-    use crate::Layout;
-    use core::alloc::GlobalAlloc;
-    use crate::NonNull;
-    use crate::HEAP;
+    // use crate::Layout;
+    // use core::alloc::GlobalAlloc;
+    // use crate::NonNull;
+    // use crate::HEAP;
     // 物理内存容量
     const MEMORY :usize= 9000_0000;
     
@@ -109,7 +116,9 @@ mod tests {
         }
     }
 
-    use page_table::{MmuMeta, Pte, VAddr, VmFlags, PPN, VPN};
+    use page_table::{MmuMeta
+        // , Pte, VAddr, VmFlags, PPN, VPN
+    };
 
     #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
     pub(crate) struct Sv39;
@@ -148,7 +157,7 @@ mod tests {
         assert_eq!(8200_1000,MEMORY - _a.len());
         assert_eq!(8800_0000,_a.end() as _);
         unsafe{
-            let region1 = core::slice::from_raw_parts_mut(_a.end() as *mut u8,MEMORY - _a.len(),);
+            let _region1 = core::slice::from_raw_parts_mut(_a.end() as *mut u8,MEMORY - _a.len(),);
             //transfer(region1);
         }
 
@@ -163,19 +172,20 @@ mod tests {
         //
         // - 这个内存块没有被其他任何对象引用；
         // - 这个内存块和已经托管的内存块不重叠。
-        unsafe {
-            let region1 = core::slice::from_raw_parts_mut(
-                _a.end() as *mut u8,
-                MEMORY - _a.len(),
-            );
-            let ptr = NonNull::new(region1.as_mut_ptr()).unwrap();
-            //HEAP.transfer(ptr, region1.len());
-            HEAP.capacity();
-            assert_eq!(0,HEAP.capacity());
-            let size = region1.len();
-            //HEAP.capacity() = size;
-            assert_eq!(0,HEAP.capacity());
-        }
+        
+        // unsafe {
+        //     let region1 = core::slice::from_raw_parts_mut(
+        //         _a.end() as *mut u8,
+        //         MEMORY - _a.len(),
+        //     );
+        //     let ptr = NonNull::new(region1.as_mut_ptr()).unwrap();
+        //     //HEAP.transfer(ptr, region1.len());
+        //     HEAP.capacity();
+        //     assert_eq!(0,HEAP.capacity());
+        //     let size = region1.len();
+        //     //HEAP.capacity() = size;
+        //     assert_eq!(0,HEAP.capacity());
+        // }
 
         // //实现page_alloc
         // extern "Rust" {

@@ -1,0 +1,1 @@
+window.ALL_CRATES = ["cfg_if","customizable_buddy","kernel_alloc","log","page_table","static_assertions"];

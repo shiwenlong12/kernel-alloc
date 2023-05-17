@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["BuddyAllocator","伙伴分配器。"],["BuddyError","伙伴分配器分配失败。"],["LinkedListBuddy","侵入式链表伙伴行。"],["UsizeBuddy","用一个 usize 作为位图保存占用情况的伙伴行。"]],"trait":[["BuddyCollection","伙伴集合。一组同阶的伙伴。"],["BuddyLine","伙伴分配器的一个行。"],["OligarchyCollection","寡头集合。伙伴分配器的顶层，不再合并。"]]};
